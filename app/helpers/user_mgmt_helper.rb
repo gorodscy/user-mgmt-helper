@@ -2,18 +2,13 @@ module UserMgmtHelper
 	require "net/http"
 	require "uri"
 
-	def sign_up user, host='http://localhost:3000'
-		raise ArgumentError.new 'User has to be a Hash.' unless user.is_a? Hash
+	def sign_up email, password, password_confirmation, host='http://localhost:3000'
+		send_request :post, :users, { user: { email: email, password: password, 
+			password_confirmation: password_confirmation }, method: :simple }, host
+	end
 
-		if valid_simple_user? user
-			method = :simple
-		elsif valid_oauth_user? user
-			method = :oauth
-		else
-			raise ArgumentError.new 'Invalid/missing atributes for user.'
-		end	
-
-		send_request :post, :users, { user: user, method: method }, host
+	def sign_up uid, strategy, host='http://localhost:3000'
+		send_request :post, :users, { user: { uid: uid, strategy: strategy }, method: :simple }, host
 	end
 
 	def log_in id, code, method=:simple, host='http://localhost:3000'
@@ -69,17 +64,6 @@ module UserMgmtHelper
 	end
 
 	private
-
-		def valid_simple_user? user
-			return (user.has_key? "email") && 
-						 (user.has_key? "password") && 
-						 (user.has_key? "password_confirmation")
-		end
-
-		def valid_oauth_user? user
-			return (user.has_key? "uid") && 
-						 (user.has_key? "strategy")
-		end
 
 		def send_request method, path='/', params={}, host='http://localhost:3000'
 			path = path.to_s.downcase
