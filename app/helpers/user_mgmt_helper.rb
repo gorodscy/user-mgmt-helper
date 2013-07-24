@@ -13,12 +13,59 @@ module UserMgmtHelper
 			raise ArgumentError.new 'Invalid/missing atributes for user.'
 		end	
 
-		uri = URI.parse(host)
-		http = Net::HTTP.new(uri.host, uri.port)
-		request = Net::HTTP::Post.new(uri.request_uri << '/users', initheader = {'Content-Type' =>'application/json'})
-		request.body = { user: user, method: method }.to_json
-		response = http.request(request)
-		return response.body
+		send_request :post, :users, { user: user, method: method }, host
+	end
+
+	def log_in id, code, method=:simple, host='http://localhost:3000'
+		if method == :simple
+			p1 = "email"
+			p2 = "password"
+		elsif method == :oauth
+			p1 = "uid"
+			p2 = "strategy"
+		else
+			raise ArgumentError.new 'Invalid method.'
+		end
+
+		send_request :get, :login, { user: { p1 => id, p2 => code }, method: method }, host
+	end
+
+	def log_out umid, host='http://localhost:3000'
+		send_request :delete, :logout, { user: umid }, host
+	end
+
+	def add_strategy uid, strategy, umid, session, host='http://localhost:3000'
+		send_request :post, :add_strategy, { new_strategy: { uid: uid, strategy: strategy }, 
+																				 user: umid, session_id: session }, host
+	end
+
+	def remove_strategy umid, strategy, session, host='http://localhost:3000'
+		send_request :delete, :remove_strategy, { user: umid, strategy: strategy, 
+																							session_id: session }, host
+	end
+
+	def delete_user umid, session, host='http://localhost:3000'
+		send_request :delete, :destroy, { user: umid, session_id: session }, host
+	end
+
+	def change_password user, password, new_pw, new_pw_confirm, session, host='http://localhost:3000'
+		send_request :put, :change_password, { user: user, password: password, 
+									new_password: new_pw, new_password_confirmation: new_pw_confirm, 
+									session: session }, host
+	end
+
+	def change_password reset_token, new_pw, new_pw_confirm, host='http://localhost:3000'
+		send_request :put, :change_password, { reset_token: reset_token, new_password: new_pw, 
+									new_password_confirmation: new_pw_confirm }, host
+	end
+
+	def change_email user, password, new_email, new_email_confirm, session, host='http://localhost:3000'
+		send_request :put, :change_email, { email: user, password: password, new_email: new_email, 
+									new_email_confirmation: new_email_confirm, session: session }, host
+	end
+
+	def reset_password email, host='http://localhost:3000'
+		send_request :post, :reset_password, { email: email }, host
 	end
 
 	private
@@ -32,6 +79,28 @@ module UserMgmtHelper
 		def valid_oauth_user? user
 			return (user.has_key? "uid") && 
 						 (user.has_key? "strategy")
+		end
+
+		def send_request method, path='/', params={}, host='http://localhost:3000'
+			path = path.to_s.downcase
+			path = '/' << path unless path.start_with? '/'
+			uri = URI.parse(host)
+			http = Net::HTTP.new(uri.host, uri.port)
+
+			case method.to_s.downcase
+				when 'get'
+				request = Net::HTTP::Get.new(uri.request_uri << path, initheader = {'Content-Type' =>'application/json'})
+				when 'post'
+				request = Net::HTTP::Post.new(uri.request_uri << path, initheader = {'Content-Type' =>'application/json'})
+				when 'put'
+				request = Net::HTTP::Put.new(uri.request_uri << path, initheader = {'Content-Type' =>'application/json'})
+				when 'delete'
+				request = Net::HTTP::Delete.new(uri.request_uri << path, initheader = {'Content-Type' =>'application/json'})
+			end
+
+			request.body = params.to_json
+			response = http.request(request)
+			return response.body
 		end
 
 end
