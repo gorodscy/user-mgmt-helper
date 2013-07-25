@@ -7,8 +7,8 @@ module UserMgmtHelper
 			password_confirmation: password_confirmation }, method: :simple }, host
 	end
 
-	def sign_up_oauth uid, strategy, host='http://localhost:3000'
-		send_request :post, :users, { user: { uid: uid, strategy: strategy }, method: :oauth }, host
+	def sign_up_oauth uid, strategy, email, host='http://localhost:3000'
+		send_request :post, :users, { user: { uid: uid, strategy: strategy, email: email }, method: :oauth }, host
 	end
 
 	def log_in email, password, host='http://localhost:3000'
@@ -21,6 +21,10 @@ module UserMgmtHelper
 
 	def log_out umid, host='http://localhost:3000'
 		send_request :delete, :logout, { user: umid }, host
+	end
+
+	def user_info session, host='http://localhost:3000'
+		send_request :get, :user_info, { session_id: session }, host
 	end
 
 	def add_strategy uid, strategy, umid, session, host='http://localhost:3000'
