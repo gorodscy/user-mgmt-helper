@@ -78,7 +78,11 @@ module UserMgmtHelper
 
 			request.body = params.to_json
 			response = http.request(request)
-			return response.body
+			begin
+				return JSON.parse(response.body)
+			rescue
+				return response.body
+			end
 		end
 
 end
