@@ -4,5 +4,22 @@
 \paperw11900\paperh16840\margl1440\margr1440\vieww10800\viewh8400\viewkind0
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural
 
-\f0\fs24 \cf0 Sign Up:\
+\f0\b\fs24 \cf0 Sign Up:
+\b0 \
+\
+usage:  sign_up email, password, password_confirmation, host="http://localhost:3000"\
+ex:        sign_up "user@provider.com", "123123", "123123", "http://localhost:3000"\
+\
+return: String: umid\
+ex:       "6oIgEseEmQCZjWD1Nli6qQ"\
+\
+
+\b Sign Up Oauth:
+\b0 \
+\
+usage:  sign_up_oauth uid, strategy, host='http://localhost:3000'\
+ex:        sign_up_oauth 'h832he27' , 'facebook', 'http://localhost:3000'\
+\
+return: String: umid\
+ex:       "6oIgEseEmQCZjWD1Nli6qQ"\
 }

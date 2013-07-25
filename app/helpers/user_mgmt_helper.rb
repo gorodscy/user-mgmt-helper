@@ -8,15 +8,15 @@ module UserMgmtHelper
 	end
 
 	def sign_up_oauth uid, strategy, host='http://localhost:3000'
-		send_request :post, :users, { user: { uid: uid, strategy: strategy }, method: :simple }, host
+		send_request :post, :users, { user: { uid: uid, strategy: strategy }, method: :oauth }, host
 	end
 
 	def log_in email, password, host='http://localhost:3000'
-		send_request :get, :login, { user: { email: => email, password: => password }, method: :simple }, host
+		send_request :get, :login, { user: { email: email, password: password }, method: :simple }, host
 	end
 
 	def log_in_oauth uid, strategy, host='http://localhost:3000'
-		send_request :get, :login, { user: { uid: => uid, strategy: => strategy }, method: :oauth }, host
+		send_request :get, :login, { user: { uid: uid, strategy: strategy }, method: :oauth }, host
 	end
 
 	def log_out umid, host='http://localhost:3000'
