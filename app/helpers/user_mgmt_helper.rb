@@ -83,10 +83,10 @@ module UserMgmtHelper
 			request.body = params.to_json
 			response = http.request(request)
 			begin
-				r = { body: JSON.parse(response.body), status: response.status }
+				r = { body: JSON.parse(response.body), status: response.code }
 				return r
 			rescue
-				r = { body: response.body, status: response.status }
+				r = { body: response.body, status: response.code }
 				return r
 			end
 		end
